@@ -1,7 +1,9 @@
-name: Build and deploy of static site
+name: Deploy to GitHub Pages
 
 on:
   push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -23,12 +25,8 @@ jobs:
       - name: Build
         run: mkdocs build
 
-      - name: Install SSH key
-
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_rsa
-          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-
-      - name: Deploy
-        run: rsync --archive --stats site/ ${{ secrets.REMOTE_DEST }}
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
